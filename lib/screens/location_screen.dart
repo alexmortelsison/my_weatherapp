@@ -1,10 +1,4 @@
-import 'dart:ui';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/painting.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
@@ -14,6 +8,18 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+  var time = DateTime.now();
+  String getMessage() {
+    var time = DateTime.now();
+    if (time.hour < 12) {
+      return 'Good Morning!';
+    } else if (time.hour >= 12 && time.hour < 17) {
+      return 'Good Afternoon!';
+    } else {
+      return 'Good Evening';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,10 +46,10 @@ class _LocationScreenState extends State<LocationScreen> {
                   ),
                 ),
               ),
-              const Text(
-                'Tokyo',
-                style: TextStyle(
-                  fontSize: 50,
+              Text(
+                '${getMessage()}, Tokyo!',
+                style: const TextStyle(
+                  fontSize: 40,
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
@@ -58,6 +64,17 @@ class _LocationScreenState extends State<LocationScreen> {
               ),
               const SizedBox(
                 height: 20,
+              ),
+              Text(
+                '${time.hour}: ${time.minute}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 50,
+                ),
+              ),
+              const SizedBox(
+                height: 50,
               ),
               Stack(
                 children: [
