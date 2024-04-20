@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:weather_test/screens/city_screen.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
@@ -314,6 +315,20 @@ class _LocationScreenState extends State<LocationScreen> {
                   ),
                 ],
               ),
+              const SizedBox(
+                height: 20,
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return const CityScreen();
+                  }));
+                },
+                child: const Text(
+                  'Enter City',
+                  style: TextStyle(color: Color.fromARGB(255, 16, 99, 167)),
+                ),
+              )
             ],
           ),
         ),
