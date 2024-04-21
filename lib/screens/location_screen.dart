@@ -1,21 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:weather_test/screens/city_screen.dart';
+import 'package:weather_test/services/weather.dart';
 
 class LocationScreen extends StatefulWidget {
-  const LocationScreen({super.key});
+  final locationWeather;
+  const LocationScreen({super.key, required this.locationWeather});
 
   @override
   State<LocationScreen> createState() => _LocationScreenState();
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+  WeatherModel weather = WeatherModel();
+  late int temperature;
+  late int temperatureMax;
+  late int temperatureMin;
+  late String weatherIcon;
+  late String cityName;
+
+  @override
+  void initState() {
+    updateUI(widget.locationWeather);
+    super.initState();
+  }
+
+  void updateUI(weatherData) {
+    setState(() {
+      if (weatherData != null) {
+        temperature = 0;
+        weatherIcon = "";
+        cityName = "";
+        temperatureMax = 0;
+        temperatureMin = 0;
+        return;
+      }
+    });
+
+    double temp = weatherData['main']['temp'];
+    temperature = temp.toInt();
+    cityName = weatherData['name'];
+    temperatureMax = weatherData['main']['temp_max'];
+    temperatureMin = weatherData['main']['temp_min'];
+  }
+
+  @override
   var time = DateTime.now();
   String getMessage() {
     var time = DateTime.now();
     if (time.hour < 12) {
-      return 'Good Morning!';
+      return 'Good Morning';
     } else if (time.hour >= 12 && time.hour < 17) {
-      return 'Good Afternoon!';
+      return 'Good Afternoon';
     } else {
       return 'Good Evening';
     }
@@ -41,7 +76,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Center(
                 child: Expanded(
                   child: Image.asset(
-                    'images/sunny.png',
+                    'images/rainy.gif',
                     height: 300,
                     width: 300,
                   ),
