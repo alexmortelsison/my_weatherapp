@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:weather_test/screens/city_screen.dart';
 import 'package:weather_test/services/weather.dart';
 
@@ -12,35 +13,38 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   WeatherModel weather = WeatherModel();
-  late int temperature;
-  late int temperatureMax;
-  late int temperatureMin;
-  late String weatherIcon;
+  late int temperature = 0;
+  late double temperatureMax = 0.0;
+  late double temperatureMin = 0.0;
+  late String weatherIcon = "";
   late String cityName;
+  late int tempMax = 0;
+  late int tempMin = 0;
 
   @override
   void initState() {
-    updateUI(widget.locationWeather);
     super.initState();
+    weather.getLocationWeather();
+    updateUI(widget.locationWeather);
   }
 
   void updateUI(weatherData) {
     setState(() {
-      if (weatherData != null) {
+      if (weatherData == null) {
         temperature = 0;
-        weatherIcon = "";
-        cityName = "";
-        temperatureMax = 0;
-        temperatureMin = 0;
+        weatherIcon = '';
+        cityName = '';
         return;
-      }
+      } else {}
     });
 
     double temp = weatherData['main']['temp'];
     temperature = temp.toInt();
     cityName = weatherData['name'];
-    temperatureMax = weatherData['main']['temp_max'];
-    temperatureMin = weatherData['main']['temp_min'];
+    temperatureMax = weatherData['main']['temp_max'].toDouble();
+    temperatureMin = weatherData['main']['temp_min'].toDouble();
+    int tempMax = temperatureMax.toInt();
+    int tempMin = temperatureMin.toInt();
   }
 
   @override
@@ -58,6 +62,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    WeatherModel weather = WeatherModel();
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -75,34 +80,36 @@ class _LocationScreenState extends State<LocationScreen> {
             children: [
               Center(
                 child: Expanded(
-                  child: Image.asset(
-                    'images/rainy.gif',
-                    height: 300,
-                    width: 300,
+                  child: weather.getWeatherIcon(
+                    800,
                   ),
                 ),
               ),
               Text(
-                '${getMessage()}, Tokyo!',
+                '${getMessage()}, \n$cityName',
+                textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 40,
+                  fontSize: 40.0,
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const Text(
-                '23°C | Sunny',
-                style: TextStyle(
-                  fontSize: 20,
+              const SizedBox(
+                height: 5,
+              ),
+              Text(
+                '$temperature°C | Sunny',
+                style: const TextStyle(
+                  fontSize: 20.0,
                   color: Colors.white,
                   fontWeight: FontWeight.w200,
                 ),
               ),
               const SizedBox(
-                height: 20,
+                height: 20.0,
               ),
               Text(
-                '${time.hour}: ${time.minute}',
+                DateFormat.Hm().format(time),
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -145,8 +152,8 @@ class _LocationScreenState extends State<LocationScreen> {
                               children: [
                                 Expanded(
                                   child: Container(
-                                    height: 40,
-                                    width: 20,
+                                    height: 40.0,
+                                    width: 20.0,
                                     decoration: BoxDecoration(
                                       color: const Color.fromARGB(
                                           255, 25, 112, 184),
@@ -165,12 +172,12 @@ class _LocationScreenState extends State<LocationScreen> {
                                   ),
                                 ),
                                 const SizedBox(
-                                  width: 10,
+                                  width: 10.0,
                                 ),
                                 Expanded(
                                   child: Container(
-                                    height: 40,
-                                    width: 15,
+                                    height: 40.0,
+                                    width: 15.0,
                                     decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius:
@@ -289,13 +296,13 @@ class _LocationScreenState extends State<LocationScreen> {
                                         borderRadius: BorderRadius.circular(20),
                                         color: Colors.white.withOpacity(0.1),
                                       ),
-                                      child: const Column(
+                                      child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
                                           Column(
                                             children: [
-                                              Text(
+                                              const Text(
                                                 'MAX TEMP',
                                                 style: TextStyle(
                                                   color: Colors.white,
@@ -304,8 +311,8 @@ class _LocationScreenState extends State<LocationScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                '25°C',
-                                                style: TextStyle(
+                                                '$tempMax°C',
+                                                style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 20,
@@ -313,12 +320,12 @@ class _LocationScreenState extends State<LocationScreen> {
                                               )
                                             ],
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             height: 30,
                                           ),
                                           Column(
                                             children: [
-                                              Text(
+                                              const Text(
                                                 'MIN TEMP',
                                                 style: TextStyle(
                                                   color: Colors.white,
@@ -327,8 +334,8 @@ class _LocationScreenState extends State<LocationScreen> {
                                                 ),
                                               ),
                                               Text(
-                                                '14°C',
-                                                style: TextStyle(
+                                                "$tempMin°C",
+                                                style: const TextStyle(
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 20,
@@ -354,16 +361,24 @@ class _LocationScreenState extends State<LocationScreen> {
                 height: 20,
               ),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return const CityScreen();
-                  }));
-                },
-                child: const Text(
-                  'Enter City',
-                  style: TextStyle(color: Color.fromARGB(255, 16, 99, 167)),
-                ),
-              )
+                  onPressed: () async {
+                    var typedName = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return const CityScreen();
+                        },
+                      ),
+                    );
+                    if (typedName != null) {
+                      var weatherData = await weather.getCityWeather(typedName);
+                      updateUI(weatherData);
+                    }
+                  },
+                  child: const Text(
+                    'Enter City',
+                    style: TextStyle(color: Color.fromARGB(255, 29, 111, 179)),
+                  )),
             ],
           ),
         ),

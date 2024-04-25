@@ -62,6 +62,12 @@ class _CityScreenState extends State<CityScreen> {
                   },
                 ),
               ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context, cityName);
+                },
+                child: const Text('Find'),
+              )
             ],
           ),
         ),
